@@ -1,0 +1,445 @@
+
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Informe PinkFairness</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; }
+                details > summary {
+                    font-size: 1.5em;
+                    font-weight: bold;
+                    color: #2C3E50;
+                    cursor: pointer;
+                    margin-bottom: 10px;
+                }
+                table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                img { max-width: 100%; display: block; margin: 20px auto; }
+            </style>
+        </head>
+        <body>
+            <h1>Informe PinkFairness</h1>
+            
+            <details>
+                <summary>1. Motivación</summary>
+                <p>En esta sección se hace la descripción del caso de uso indicando el problema o tarea específica que se soluciona, proporcionando una visión general del mismo. Asimismo, se establece las necesidades y requisitos específicos del proyecto.</p>
+                <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Requisito</th>
+      <th>Descripcion</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>target_population</td>
+      <td>La población objetivo está compuesta por personas que han sido arrestadas en el condado de Broward, Florida, y cuyos perfiles fueron evaluados mediante el sistema COMPAS para predecir su probabilidad de reincidencia. La solución impacta principalmente a:\nPersonas privadas de la libertad y en proceso judicial.\nFuncionarios judiciales que toman decisiones de libertad condicional o fianza.\nComunidades vulnerables, especialmente aquellas sobre-representadas en el sistema penal (ej. personas afroamericanas).</td>
+    </tr>
+    <tr>
+      <td>context</td>
+      <td>El objetivo del sistema es predecir la probabilidad de reincidencia criminal de una persona en un periodo de dos años, para apoyar la toma de decisiones judiciales como libertad condicional, asignación de recursos de rehabilitación o severidad de las penas. Las metas principales son:\nEvaluar el riesgo de reincidencia de forma automatizada.\nEstablecer perfiles de riesgo que contribuyan a decisiones más informadas.\nMejorar la eficiencia del sistema judicial penal.</td>
+    </tr>
+    <tr>
+      <td>sensitive_data</td>
+      <td>En el análisis con enfoque de equidad se reconoce que variables como raza y género son atributos sensibles. El manejo adecuado implica:\nEvaluar el impacto de estos atributos en las decisiones del modelo.\nDocumentar y monitorear continuamente los resultados para evitar discriminación sistemática.</td>
+    </tr>
+    <tr>
+      <td>limitations</td>
+      <td>Representatividad limitada: los datos provienen únicamente del condado de Broward, Florida, lo que impide su generalización a otras jurisdicciones.\nPosibles sesgos históricos: los registros reflejan decisiones humanas pasadas, que pueden estar sesgadas.\nTransparencia del algoritmo: el sistema COMPAS es propietario, lo que impide conocer todos los detalles de su funcionamiento interno.\nTiempo de validez: los datos corresponden a un periodo determinado, lo que puede generar desactualización.</td>
+    </tr>
+    <tr>
+      <td>benefits</td>
+      <td>Mejora en la toma de decisiones judiciales si se garantiza equidad y precisión.\nReducción del hacinamiento carcelario si se identifican correctamente personas de bajo riesgo.\nDisminución de reincidencia al identificar casos que requieren intervención o seguimiento.</td>
+    </tr>
+    <tr>
+      <td>ethics</td>
+      <td>Uso correcto: una aplicación justa del modelo puede mejorar la eficiencia judicial y proteger los derechos individuales.\nUso malintencionado o negligente:\nDiscriminación sistemática hacia grupos históricamente marginados (por ejemplo, afroamericanos).\nPerpetuación de sesgos institucionales al no intervenir adecuadamente en los datos de entrenamiento.</td>
+    </tr>
+    <tr>
+      <td>maintenance</td>
+      <td>Se recomienda un monitoreo semestral para:\nAccuracy: Proporción de predicciones correctas sobre el total de casos. Mide el rendimiento general del modelo.\nRecall (Sensibilidad o Tasa de verdaderos positivos): Mide cuántos de los casos realmente positivos (reincidentes) fueron correctamente identificados por el modelo. Es especialmente importante si se quiere evitar liberar a una persona que sí reincide.\nF1-score: Media armónica entre precisión y recall. Es útil cuando existe un desbalance de clases (por ejemplo, si hay menos reincidentes que no reincidentes) y se busca un equilibrio entre falsos positivos y falsos negativos.\nDisparate Impact: Relación entre las tasas de resultados favorables entre un grupo protegido (por ejemplo, personas negras) y un grupo privilegiado (por ejemplo, personas blancas). Un valor cercano a 1 indica paridad, valores inferiores a 0.8 pueden indicar discriminación según criterios legales.\nEqual Opportunity Difference: Diferencia en las tasas de verdaderos positivos entre grupos. Evalúa si el modelo otorga las mismas oportunidades de recibir un resultado positivo correcto a todos los grupos.\nStatistical Parity Difference: Diferencia en la tasa de predicciones positivas entre grupos. Evalúa si los grupos tienen igual probabilidad de ser clasificados como positivos, sin importar el resultado real.</td>
+    </tr>
+    <tr>
+      <td>description</td>
+      <td>El conjunto de datos utilizado corresponde a la base de datos de COMPAS Recidivism, publicada por la organización ProPublica. Esta base contiene información de aproximadamente 7.000 personas arrestadas en el condado de Broward, Florida, durante los años 2013 y 2014, sobre reincidencia en el sistema judicial estadounidense.\nEl dataset se encuentra en formato CSV y contiene atributos que describen características demográficas, penales y judiciales de las personas evaluadas. El atributo objetivo o variable de clase es two_year_recid, que indica si la persona cometió un nuevo delito dentro de ese intervalo de tiempo.</td>
+    </tr>
+  </tbody>
+</table>
+            </details>
+            
+            <details>
+                <summary>2. Comprensión de los datos</summary>
+                <p>A continuación, se describe el análisis de los datos disponibles para la construcción del modelo</p>
+            
+            
+            <!-- Los títulos con nivel <h3> se dejan sin desplegable -->
+            <h3>2.1 Recopilación de datos iniciales</h3>
+            <p>Cual fue la manera en que se llevó a cabo el proceso de recopilación de los datos, indicando si los datos utilizados corresponden a toda una población o si son una muestra representativa de la misma, especificando el porcentaje que representan en relación a la población en cuestión. Además, identificar las razones por las cuales existen valores perdidos en los datos. Asimismo, indicar si los datos han sido sometidos a algún tipo de tratamiento o transformación, o si se encuentran en su formato original</p>   
+            <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Ítem</th>
+      <th>Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Fuente de Datos</td>
+      <td>El conjunto de datos utilizado corresponde a la base de datos de COMPAS Recidivism, publicada por la organización ProPublica. Esta base contiene información de aproximadamente 7.000 personas arrestadas en el condado de Broward, Florida, durante los años 2013 y 2014, sobre reincidencia en el sistema judicial estadounidense.</td>
+    </tr>
+    <tr>
+      <td>Filas</td>
+      <td>5771</td>
+    </tr>
+    <tr>
+      <td>Columnas</td>
+      <td>5</td>
+    </tr>
+    <tr>
+      <td>Atributos sensibles</td>
+      <td>[race]</td>
+    </tr>
+    <tr>
+      <td>Atributo de clase</td>
+      <td>two_year_recid</td>
+    </tr>
+    <tr>
+      <td>Formato</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Descripción</td>
+      <td>El conjunto de datos utilizado corresponde a la base de datos de COMPAS Recidivism, publicada por la organización ProPublica. Esta base contiene información de aproximadamente 7.000 personas arrestadas en el condado de Broward, Florida, durante los años 2013 y 2014, sobre reincidencia en el sistema judicial estadounidense.</td>
+    </tr>
+  </tbody>
+</table>
+            
+            <h3>2.2 Descripción de los datos</h3>
+            <p>En esta sección se busca comprender la naturaleza y las características de cada atributo en el conjunto de datos. Esto implica examinar el tipo de dato, la escala de medición, el rango de valores posibles, la presencia de valores atípicos o perdidos, y cualquier otra información relevante relacionada con cada atributo</p>
+            <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Atributo</th>
+      <th>Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>sex</td>
+      <td>Sexo de la persona evaluada. Generalmente toma los valores Male (hombre) o Female (mujer). Es considerado un atributo sensible o protegido.</td>
+    </tr>
+    <tr>
+      <td>age_cat</td>
+      <td>Categoría de edad. Agrupa la edad cronológica en rangos como Less than 25, 25 - 45, y Greater than 45.</td>
+    </tr>
+    <tr>
+      <td>race</td>
+      <td>Raza de la persona evaluada. Incluye categorías como African-American, Caucasian, Hispanic, Asian, Native American, etc. Es otro atributo sensible comúnmente analizado por su impacto en las predicciones.</td>
+    </tr>
+    <tr>
+      <td>priors_count</td>
+      <td>Número de antecedentes penales antes del cargo actual. Es una variable numérica que indica cuántas veces la persona ha sido arrestada anteriormente.</td>
+    </tr>
+    <tr>
+      <td>c_charge_degree</td>
+      <td>Gravedad del cargo más reciente. Suele codificarse como F (felonía, o delito grave) o M (misdemeanor, o delito menor).</td>
+    </tr>
+    <tr>
+      <td>two_year_recid</td>
+      <td>Variable objetivo. Indica si la persona fue arrestada nuevamente dentro de los dos años posteriores a la evaluación. Es binaria: 1 si reincidió, 0 si no reincidió.</td>
+    </tr>
+  </tbody>
+</table>
+            
+
+            <h3>Estadística atributos ordinales y nominales</h3>    
+            <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Atributo</th>
+      <th>Tipo</th>
+      <th>Cantidad</th>
+      <th>Valores unicos</th>
+      <th>Mas frecuente</th>
+      <th>Menos frecuente</th>
+      <th>Valores nulos</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>sex</td>
+      <td>category</td>
+      <td>5771</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>age_cat</td>
+      <td>category</td>
+      <td>5771</td>
+      <td>3</td>
+      <td>25</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>race</td>
+      <td>category</td>
+      <td>5771</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>priors_count</td>
+      <td>category</td>
+      <td>5771</td>
+      <td>3</td>
+      <td>3</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>c_charge_degree</td>
+      <td>category</td>
+      <td>5771</td>
+      <td>2</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>two_year_recid</td>
+      <td>category</td>
+      <td>5771</td>
+      <td>2</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+            
+            <h3>Estadística atributos continuos y discretos</h3>
+            
+
+
+                <h3>2.3 Exploración de datos</h3>
+                <p>Se realiza el análisis de las distribuciones de las variables de forma individual como relacionadas con la clase y los atributos sensibles</p>
+
+            
+            
+                <h3>Gráfico de Distribución de las Variables</h3>
+                <img src="E:\OneDrive\Documentos\DOCTORADO\TESIS\FINAL\personal\pinkFairness\src/output/images//two_year_recid/Bar_Plots_Cats.png" alt="Distribución de la Variable Objetivo">
+            
+            
+           
+                <h3>Relación entre atributos</h3>
+                <p>Registros del grupo privilegiado (`race` == 1): 1980 (34.31%)
+</p>
+<p>col_0           Conteo
+two_year_recid        
+0                 788 
+1                1192 </p>
+            
+            
+            
+                <h3>2.4 Verificación de calidad de datos</h3>
+                <p>En esta sección se determina que atributos deben ser intervenidos y como se debería realizar dicha intervención</p> 
+                <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Attribute</th>
+      <th>Data Type</th>
+      <th>Missing Values%</th>
+      <th>Unique Values%</th>
+      <th>Minimum Value</th>
+      <th>Maximum Value</th>
+      <th>DQ Issue</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>sex</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>age_cat</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>2</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>race</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>priors_count</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>2</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>c_charge_degree</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>two_year_recid</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>1</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Target column</td>
+    </tr>
+  </tbody>
+</table>
+            </details>
+            
+            <details>
+                <summary>3. Preparación de los datos</summary>
+                <p>En esta etapa los datos deben ser intervenidos con el fin de que tengan las representaciones adecuadas tanto del caso de uso que se está solucionando</p>       
+                <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Metrica</th>
+      <th>Columna_1</th>
+      <th>Columna_2</th>
+      <th>Valor</th>
+      <th>Ranking</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>priors_count</td>
+      <td>two_year_recid</td>
+      <td>465.532597</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>age_cat</td>
+      <td>priors_count</td>
+      <td>287.857129</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>priors_count</td>
+      <td>c_charge_degree</td>
+      <td>171.130398</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>age_cat</td>
+      <td>two_year_recid</td>
+      <td>143.128396</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>age_cat</td>
+      <td>race</td>
+      <td>141.142711</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>sex</td>
+      <td>priors_count</td>
+      <td>103.057212</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>race</td>
+      <td>priors_count</td>
+      <td>79.922280</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>c_charge_degree</td>
+      <td>two_year_recid</td>
+      <td>55.908188</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>sex</td>
+      <td>two_year_recid</td>
+      <td>47.347854</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>sex</td>
+      <td>race</td>
+      <td>37.322490</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+                <p>Este informe presenta el análisis de equidad realizado sobre el dataset y los modelos evaluados.</p>
+                <table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Group</th>
+      <th>Non-Privileged Label Distribution</th>
+      <th>Jensen-Shannon Divergence</th>
+      <th>Kullback-Leibler Divergence</th>
+      <th>Demographic Parity</th>
+      <th>Theil Index (Overall)</th>
+      <th>Theil Index (Within-group)</th>
+      <th>Theil Index (Between-group)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Non-Privileged Group (race != 1)</td>
+      <td>{1: 0.521762068055922, 0: 0.4782379319440781}</td>
+      <td>0.000237</td>
+      <td>0.000947</td>
+      <td>0.080258</td>
+      <td>0.0</td>
+      <td>0.0</td>
+      <td>0.0</td>
+    </tr>
+  </tbody>
+</table>
+            
+            
+            <img src="E:\OneDrive\Documentos\DOCTORADO\TESIS\FINAL\personal\pinkFairness\src/output/images//two_year_recid/correlation_phik_heatmap.png" alt="Distribución de la Variable Objetivo">
+           </details> 
+        </body>
+        </html>
+        
