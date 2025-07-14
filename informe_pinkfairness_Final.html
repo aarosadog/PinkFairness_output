@@ -1013,7 +1013,7 @@
                 
                 
                 <h3>Gráfico de Distribución de las Variables</h3>
-                <img src="PinkFairness_output/output/images/class/Dist_Plots_target.png" alt="Distribución de la Variable Objetivo">
+                <img src="output/images/class/Dist_Plots_target.png" alt="Distribución de la Variable Objetivo">
                 <fieldset>
                     <legend>1. Cargar el archivo <code>src/config/config_generated.json</code></legend>
                     <input type="file" id="cfgInput" accept=".json">
@@ -1770,7 +1770,7 @@
 </table>
                 <p>El mapa de calor visualiza la matriz de correlaciones φK entre todas las variables del conjunto de datos, filtrando únicamente los pares con un coeficiente superior a 0.6. Las relaciones más débiles (φK < 0.6) se omiten, representándose en blanco para simplificar la interpretación. Cada celda coloreada refleja el grado de asociación no lineal o mixta entre dos atributos, los tonos rojizos (correlaciones moderadas) y los tonos verdosos (correlaciones más intensas). Un φK cercano a 1 se muestra en verde intenso, indicando que el par de variables que comparten patrones de variación significativos.</p>    
                 
-                <img src="/output/images/class/correlation_phik_heatmap.png" alt="Heatmap de Correlación">
+                <img src="output/images/class/correlation_phik_heatmap.png" alt="Heatmap de Correlación">
             </details>
 
             <details>
@@ -11158,7 +11158,7 @@
                 <p>¿Qué porcentaje de cada grupo recibe una predicción positiva?</p>
                 <p>¿Las predicciones dentro de un mismo grupo son consistentes o varían mucho?</p>
                 <p>¿Hay diferencias significativas en las tasas de predicción positiva?</p>
-                <img src="/output/images/class/grafico_probabilidad_prediccion.png" alt="Distribución de la Probabilidad de Predicción Positiva por Grupo Sensible">
+                <img src="output/images/class/grafico_probabilidad_prediccion.png" alt="Distribución de la Probabilidad de Predicción Positiva por Grupo Sensible">
 
                 <p><b>DebiasingFramework</b></p>
                 <p>Mediante un procedimiento de clustering, se identifica un conjunto de puntos que resumen la distribución de los datos originales. Para ello, se evalúan múltiples particiones de K-means con distintos números de clusters, midiendo la cohesión y separación de cada agrupamiento utilizando el silhouette score. El valor de K que maximiza esta métrica se selecciona como óptimo, ya que equilibraba adecuadamente la homogeneidad interna de los grupos y su distinción mutua. A partir de estos K centroides, se construye una muestra representativa más ligera que el conjunto completo, lo que permite mejorar los tiempos de respuesta en los cálculos posteriores sin perder la esencia estadística de los datos originales.</p>
