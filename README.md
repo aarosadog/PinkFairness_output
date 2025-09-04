@@ -11,6 +11,6 @@ Consolidado general de las intervenciones documentadas. En esta versión incluye
 
 Salidas generadas por la herramienta PinkFairMain para los conjuntos de datos clásicos en la literatura: Adult, COMPAS y German Credit.
 
-### Output_lit (contexto colombiano)
+### Output_col 
 
 Salidas producidas por PinkFairMain para los casos de desmovilización, población privada de la libertad y acceso a educación superior.
