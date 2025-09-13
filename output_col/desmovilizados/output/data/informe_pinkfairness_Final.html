@@ -17249,7 +17249,7 @@
                 <p>¿Qué porcentaje de cada grupo recibe una predicción positiva?</p>
                 <p>¿Las predicciones dentro de un mismo grupo son consistentes o varían mucho?</p>
                 <p>¿Hay diferencias significativas en las tasas de predicción positiva?</p>
-                <img src="E:\OneDrive\Documentos\DOCTORADO\TESIS\FINAL\personal\pinkFairness\src/output/images//DES_BIE_ENC/grafico_probabilidad_prediccion.png" alt="Distribución de la Probabilidad de Predicción Positiva por Grupo Sensible">
+                <img src="../images/DES_BIE_ENC/grafico_probabilidad_prediccion.png" alt="Distribución de la Probabilidad de Predicción Positiva por Grupo Sensible">
 
                 <p><b>DebiasingFramework</b></p>
                 <p>Mediante un procedimiento de clustering, se identifica un conjunto de puntos que resumen la distribución de los datos originales. Para ello, se evalúan múltiples particiones de K-means con distintos números de clusters, midiendo la cohesión y separación de cada agrupamiento utilizando el silhouette score. El valor de K que maximiza esta métrica se selecciona como óptimo, ya que equilibraba adecuadamente la homogeneidad interna de los grupos y su distinción mutua. A partir de estos K centroides, se construye una muestra representativa más ligera que el conjunto completo, lo que permite mejorar los tiempos de respuesta en los cálculos posteriores sin perder la esencia estadística de los datos originales.</p>
