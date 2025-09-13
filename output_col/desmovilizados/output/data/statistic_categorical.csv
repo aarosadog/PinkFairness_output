@@ -1,0 +1,39 @@
+Atributo,Tipo,Cantidad,Valores unicos,Mas frecuente,Menos frecuente,Valores nulos
+POS_CON_ENC,category,17094,2,1,0,0
+BEN_TRV_ENC,category,17094,2,0,1,0
+BEN_FA_ENC,category,17094,2,0,1,0
+BEN_FPT_ENC,category,17094,2,0,1,0
+BEN_PDT_ENC,category,17094,2,0,1,0
+POS_SPU_ENC,category,17094,2,1,0,0
+REG_SAL_ENC,category,17094,2,1,0,0
+SEXO_ENC,category,17094,2,1,0,0
+NIV_EDU_ENC,category,17094,4,4,1,0
+POS_SSO_ENC,category,17094,3,3,2,0
+GRUPO_ETAR_ENC_Entre 18 y 25 años,category,17094,2,0,1,0
+GRUPO_ETAR_ENC_Entre 26 y 40 años,category,17094,2,0,1,0
+GRUPO_ETAR_ENC_Entre 41 y 60 años,category,17094,2,1,0,0
+GRUPO_ETAR_ENC_Mayor de 60 años,category,17094,2,0,1,0
+EX_GRUPO_ENC_AUC,category,17094,2,1,0,0
+EX_GRUPO_ENC_ELN,category,17094,2,0,1,0
+EX_GRUPO_ENC_EPL,category,17094,2,0,1,0
+EX_GRUPO_ENC_ERG,category,17094,2,0,1,0
+EX_GRUPO_ENC_ERP,category,17094,2,0,1,0
+EX_GRUPO_ENC_FARC,category,17094,2,0,1,0
+TIP_VIV_ENC_Apartamento,category,17094,2,0,1,0
+TIP_VIV_ENC_Casa,category,17094,2,1,0,0
+TIP_VIV_ENC_Casa_Lote,category,17094,2,0,1,0
+TIP_VIV_ENC_Finca,category,17094,2,0,1,0
+TIP_VIV_ENC_Habitacion,category,17094,2,0,1,0
+TIP_VIV_ENC_Otro,category,17094,2,0,1,0
+TIP_VIV_ENC_Rancho,category,17094,2,0,1,0
+TIP_VIV_ENC_Vivienda indigena,category,17094,2,0,1,0
+REG_VIV_ENC_Familiar,category,17094,2,0,1,0
+REG_VIV_ENC_No_Registra,category,17094,2,0,1,0
+REG_VIV_ENC_Otra_forma,category,17094,2,0,1,0
+REG_VIV_ENC_Sana_posesión_título,category,17094,2,0,1,0
+REG_VIV_ENC_arriendo_subarriendo,category,17094,2,0,1,0
+REG_VIV_ENC_usufructo,category,17094,2,0,1,0
+OCU_ECO_ENC_Desocupados,category,17094,2,0,1,0
+OCU_ECO_ENC_Ocupados_Informal,category,17094,2,1,0,0
+NUM_HIJOS_NOR,category,17094,12,0,10,0
+DES_BIE_ENC,category,17094,2,1,0,0

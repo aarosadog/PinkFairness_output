@@ -1,0 +1,42 @@
+Attribute,Data Type,Missing Values%,Unique Values%,Minimum Value,Maximum Value,DQ Issue
+POS_CON_ENC,category,0.0,0,,,No issue
+BEN_TRV_ENC,category,0.0,0,,,No issue
+BEN_FA_ENC,category,0.0,0,,,1 rare categories: [1]. Group them into a single category or drop the categories.
+BEN_FPT_ENC,category,0.0,0,,,1 rare categories: [1]. Group them into a single category or drop the categories.
+BEN_PDT_ENC,category,0.0,0,,,No issue
+POS_SPU_ENC,category,0.0,0,,,No issue
+REG_SAL_ENC,category,0.0,0,,,No issue
+SEXO_ENC,category,0.0,0,,,No issue
+NIV_EDU_ENC,category,0.0,0,,,No issue
+POS_SSO_ENC,category,0.0,0,,,1 rare categories: [2]. Group them into a single category or drop the categories.
+GRUPO_ETAR_ENC_Entre 18 y 25 años,category,0.0,0,,,1 rare categories: [1]. Group them into a single category or drop the categories.
+GRUPO_ETAR_ENC_Entre 26 y 40 años,category,0.0,0,,,No issue
+GRUPO_ETAR_ENC_Entre 41 y 60 años,category,0.0,0,,,No issue
+GRUPO_ETAR_ENC_Mayor de 60 años,category,0.0,0,,,No issue
+EX_GRUPO_ENC_AUC,category,0.0,0,,,No issue
+EX_GRUPO_ENC_ELN,category,0.0,0,,,No issue
+EX_GRUPO_ENC_EPL,category,0.0,0,,,1 rare categories: [1]. Group them into a single category or drop the categories.
+EX_GRUPO_ENC_ERG,category,0.0,0,,,1 rare categories: [1]. Group them into a single category or drop the categories.
+EX_GRUPO_ENC_ERP,category,0.0,0,,,1 rare categories: [1]. Group them into a single category or drop the categories.
+EX_GRUPO_ENC_FARC,category,0.0,0,,,No issue
+TIP_VIV_ENC_Apartamento,category,0.0,0,,,No issue
+TIP_VIV_ENC_Casa,category,0.0,0,,,No issue
+TIP_VIV_ENC_Casa_Lote,category,0.0,0,,,No issue
+TIP_VIV_ENC_Finca,category,0.0,0,,,No issue
+TIP_VIV_ENC_Habitacion,category,0.0,0,,,No issue
+TIP_VIV_ENC_Otro,category,0.0,0,,,No issue
+TIP_VIV_ENC_Rancho,category,0.0,0,,,No issue
+TIP_VIV_ENC_Vivienda indigena,category,0.0,0,,,1 rare categories: [1]. Group them into a single category or drop the categories.
+REG_VIV_ENC_Familiar,category,0.0,0,,,No issue
+REG_VIV_ENC_No_Registra,category,0.0,0,,,1 rare categories: [1]. Group them into a single category or drop the categories.
+REG_VIV_ENC_Otra_forma,category,0.0,0,,,No issue
+REG_VIV_ENC_Sana_posesión_título,category,0.0,0,,,1 rare categories: [1]. Group them into a single category or drop the categories.
+REG_VIV_ENC_arriendo_subarriendo,category,0.0,0,,,No issue
+REG_VIV_ENC_usufructo,category,0.0,0,,,No issue
+OCU_ECO_ENC_Desocupados,category,0.0,0,,,No issue
+OCU_ECO_ENC_Ocupados_Informal,category,0.0,0,,,No issue
+DEP_RES_ENC,float64,0.0,NA,4.6798951703481845e-05,0.2119992512167727,Column has 3337 outliers greater than upper bound (0.17) or lower than lower bound(-0.06). Cap them or remove them.
+MUN_RES_ENC,float64,0.0,NA,4.6798951703481845e-05,0.0861100711344066,Column has 2498 outliers greater than upper bound (0.05) or lower than lower bound(-0.03). Cap them or remove them.
+NUM_HIJOS_NOR,category,0.0,0,,,"6 rare categories: [6, 7, 8, 11, 9, 10]. Group them into a single category or drop the categories."
+AÑO_ING_NOR,float64,0.0,NA,2003.0,2019.0,Column has 1047 outliers greater than upper bound (2013.50) or lower than lower bound(2001.50). Cap them or remove them.
+DES_BIE_ENC,category,0.0,0,,,Target column
