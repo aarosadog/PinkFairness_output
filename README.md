@@ -14,3 +14,6 @@ Salidas generadas por la herramienta PinkFairMain para los conjuntos de datos cl
 ### Output_col 
 
 Salidas producidas por PinkFairMain para los casos de desmovilización, población privada de la libertad y acceso a educación superior.
+#### desmovilizados
+https://raw.githack.com/aarosadog/PinkFairness_output/master/output_col/desmovilizados/output/data/informe_pinkfairness_Final.html
+https://raw.githack.com/aarosadog/PinkFairness_output/master/output_col/desmovilizados/output/data/informe_pinkfairness_EDACorr.html
