@@ -1,0 +1,2 @@
+Group,Non-Privileged Label Distribution,Jensen-Shannon Divergence,Kullback-Leibler Divergence,Demographic Parity,Overall Theil,Within-group Theil,Between-group Theil
+Non-Privileged Group (ENC_GENERO != 1),"{0: 0.8033519553072626, 1: 0.19664804469273742}",0.05196919136485766,0.19742681348972374,0.09406385742072196,1.2651184030354758,1.2707782961892042,0.005069091469957803

@@ -1,0 +1,22 @@
+Attribute,Data Type,Missing Values%,Unique Values%,Minimum Value,Maximum Value,DQ Issue
+ENC_HOMICIDIO,category,0.0,0,,,No issue
+ENC_HURTO,category,0.0,0,,,No issue
+ENC_FATRAPORTE_ARMAS_MUNICIONES,category,0.0,0,,,No issue
+ENC_TRAFAPORTE_ESTUPEFACIENTES,category,0.0,0,,,No issue
+ENC_CONCIERTO_DELINQUIR,category,0.0,0,,,No issue
+ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES,category,0.0,0,,,No issue
+ENC_ACTOS_SEXUALES_MENOR_14,category,0.0,0,,,No issue
+ENC_ACC_CARNAL_14,category,0.0,0,,,No issue
+ENC_ANNO_INGRESO,int64,0.0,0,1997.0,2021.0,Possible date-time colum: transform before modeling step.
+ENC_INTRAMUROS,category,0.0,0,,,No issue
+ENC_MESES_CONDENA,int64,0.0,3,0.0,720.0,Column has 1260 outliers greater than upper bound (349.00) or lower than lower bound(-123.00). Cap them or remove them.
+ENC_RANGOS_EDAD_INPEC,category,0.0,0,,,No issue
+ENC_GENERO,category,0.0,0,,,No issue
+ENC_NIVEL_EDUCATIVO,category,0.0,0,,,"3 rare categories: [8, 7, 9]. Group them into a single category or drop the categories."
+ENC_REGIONAL_CENTRAL,category,0.0,0,,,No issue
+ENC_REGIONAL_OCCIDENTE,category,0.0,0,,,No issue
+ENC_REGIONAL_NOROESTE,category,0.0,0,,,No issue
+ENC_REGIONAL_NORTE,category,0.0,0,,,No issue
+ENC_REGIONAL_ORIENTE,category,0.0,0,,,No issue
+ENC_REGIONAL_VIEJO_CALDAS,category,0.0,0,,,No issue
+ENC_REINCIDENTE,category,0.0,0,,,Target column

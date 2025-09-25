@@ -1,0 +1,6 @@
+metrica,umbral_baseline,criterio
+f1_score,0.3711832061068702,≥ (rendimiento)
+recall,0.278853046594982,≥ (rendimiento)
+precision,0.5549215406562055,≥ (rendimiento)
+disparate_impact,0.4289954811442327,≥ (ratio)
+false_positive_rate_difference,0.0620903410299221,≤ |diferencia|

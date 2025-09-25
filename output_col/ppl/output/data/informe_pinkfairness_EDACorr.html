@@ -1,0 +1,2620 @@
+
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Informe PinkFairness</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 40px; }
+                details > summary {
+                    font-size: 1.5em;
+                    font-weight: bold;
+                    color: #2C3E50;
+                    cursor: pointer;
+                    margin-bottom: 10px;
+                }
+                table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                img { max-width: 100%; display: block; margin: 20px auto; }
+                /* FRANJA MODERNA PARA h3 */
+                summary {
+                    position: relative;
+                    font-size: 1.3em;
+                    font-weight: bold;
+                    color: #b91c5c;
+                    margin-top: 36px;
+                    margin-bottom: 32px;
+                    padding-bottom: 10px;
+                    background: none;
+                    border: none;
+                }
+                summary::after {
+                    content: "";
+                    position: absolute;
+                    left: 0;
+                    bottom: -4px;
+                    width: 100%;
+                    height: 7px;
+                    background: linear-gradient(90deg, #ec4899 0%, #fce7f3 70%, #34d399 100%);
+                    border-radius: 6px;
+                    opacity: 0.85;
+                }  
+                #vis { display: flex; flex-direction: column; gap: 2rem; }
+                .sensitive-section { border-top: 1px solid #ccc; padding-top: 1rem; }
+                .charts { display: flex; flex-wrap: wrap; gap: 1rem; }
+                .chart { flex: 1 1 45%; min-width: 300px; }               
+            </style>
+            <script src="https://cdn.jsdelivr.net/npm/vega@5"></script>
+            <script src="https://cdn.jsdelivr.net/npm/vega-lite@5.4.0"></script>
+            <script src="https://cdn.jsdelivr.net/npm/vega-embed@6"></script>
+            <!-- DataTables CSS / JS -->
+            <link
+            rel="stylesheet"
+            type="text/css"
+            href="https://cdn.datatables.net/1.13.4/css/jquery.dataTables.min.css"
+            />
+            <script
+            src="https://code.jquery.com/jquery-3.6.0.min.js"
+            crossorigin="anonymous"
+            ></script>
+            <script
+            src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"
+            crossorigin="anonymous"
+            ></script>
+        </head>
+        <body>
+            <h1>Informe PinkFairness</h1>
+            
+            <details>
+                <summary>1. Motivación</summary>
+                <p>En esta sección se hace la descripción del caso de uso indicando el problema o tarea específica que se soluciona, proporcionando una visión general del mismo. Asimismo, se establece las necesidades y requisitos específicos del proyecto.</p>
+                <table class="dataframe display">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Requisito</th>
+      <th>Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Población objetivo</td>
+      <td>Personas privadas de la libertad que están próximas a recuperar su libertad, quienes serán evaluadas para determinar su riesgo de reincidencia.\nAutoridades judiciales y penitenciarias, que utilizarán la herramienta como apoyo en procesos de toma de decisiones para intervenciones o seguimientos posteriores.\nLa sociedad en general, en la medida en que decisiones más informadas puedan contribuir a una disminución de la reincidencia y mayor reintegración social.\nOrganizaciones de reintegración social, que pueden utilizar la información para orientar programas de apoyo.</td>
+    </tr>
+    <tr>
+      <td>Contexto</td>
+      <td>Propósito:\nDesarrollar un sistema de predicción basado en aprendizaje automático para identificar el riesgo de reincidencia delictiva en personas privadas de la libertad, garantizando equidad entre sexos.\nMetas principales:\nPredecir con alto rendimiento si una persona puede reincidir.\nMinimizar los falsos positivos (personas clasificadas erróneamente como reincidentes).\nEvaluar y mitigar posibles sesgos de género en el proceso de predicción.\nFacilitar la toma de decisiones basadas en datos para procesos de seguimiento y reintegración.\nPreguntas clave:\n¿Cuál es la probabilidad de que una persona reincida tras recuperar la libertad?\n¿El modelo discrimina de forma significativa entre hombres y mujeres?\n¿Qué variables contribuyen más a la predicción de la reincidencia?</td>
+    </tr>
+    <tr>
+      <td>Atributos sensibles</td>
+      <td>El conjunto de datos fue descargado de la plataforma de datos abiertos de Colombia, por lo tanto, como lo señala la misma pagina "El Ministerio de Tecnologías de la Información y las Comunicaciones (MINTIC) es el responsable del tratamiento de los datos personales suministrados por los usuarios de este sitio web".\nAdemás del respaldo que se tiene al trabajar con datos de dominio público, dentro del tratamiento de la información en este proyecto el atributo sexo será el atributo sensible que será monitoreado.</td>
+    </tr>
+    <tr>
+      <td>Limitaciones</td>
+      <td>Riesgo de sobreajuste y generalización\nEl proyecto contempla mecanismos de validación cruzada y pruebas con conjuntos de datos independientes para asegurar que el modelo generalice adecuadamente a nuevas situaciones. Se evita así el sobreajuste a patrones específicos del conjunto de entrenamiento.\nVulnerabilidad ante manipulaciones o datos adversos\nEn este proyecto no han tomado precauciones para mitigar riesgos derivados de entradas manipuladas o adversariales. Esto incluye validaciones automáticas de calidad de datos de entrada y revisiones manuales en casos de predicciones atípicas.\nFormación y acompañamiento al personal\nEl sistema está diseñado como herramienta de apoyo a la toma de decisiones humanas. Por ello, se prevé la capacitación del personal penitenciario, judicial y administrativo sobre:\nLa correcta interpretación de los resultados.\nLas limitaciones inherentes al modelo.\nEl uso ético y responsable de los sistemas de IA.\nAceptación social y confianza pública\nComprendiendo la sensibilidad del contexto, se han definido mecanismos para comunicar a la sociedad:\nEl objetivo del sistema y sus beneficios.\nLa posibilidad de auditorías externas o revisión ciudadana.\nNo sustituye el juicio humano: El sistema es solo una herramienta de apoyo a la toma de decisiones.</td>
+    </tr>
+    <tr>
+      <td>Beneficios</td>
+      <td>Mejor asignación de recursos de intervención (psicosociales, laborales, educativos).\nReducción de la reincidencia, al intervenir preventivamente en casos con alto riesgo.\nMayor equidad en las decisiones al identificar y mitigar sesgos.\nTransparencia y trazabilidad en los procesos de toma de decisión.\nFortalecimiento de políticas de reintegración social y justicia restaurativa.</td>
+    </tr>
+    <tr>
+      <td>Criterios éticos</td>
+      <td>Uso responsable: El modelo se utiliza como insumo, junto con la evaluación humana → se mejoran decisiones y se reduce reincidencia.\nUso automatizado sin supervisión: Se corre el riesgo de tomar decisiones injustas o discriminatorias si no se interpretan correctamente los resultados.\nDatos mal utilizados o con sesgos no corregidos: Podría reforzar patrones históricos de discriminación, especialmente por género.\nPodría disminuir el análisis cualitativo y la intervención humana.</td>
+    </tr>
+    <tr>
+      <td>Mantenimiento</td>
+      <td>Frecuencia recomendada: Cada 6 meses o tras una cantidad significativa de nuevos datos (por ejemplo, cada 500 evaluaciones).\nRecall\t% de reincidentes correctamente identificados\tEvita liberar a quien reincide (minimiza falsos negativos)\nPrecision\t% de predicciones de reincidencia que fueron ciertas\tÚtil si hay consecuencias por etiquetar falsamente\nF1-score\tBalance entre Recall y Precision\tBuena métrica de resumen\nDisparate Impact (DI)\tProporción de decisiones positivas entre grupos. Deseable que esté cerca de 1\nFalse Positive Rate Difference\tDiferencia en castigar injustamente a un subgrupo. Deseable cerca de 0.</td>
+    </tr>
+  </tbody>
+</table>
+            </details>
+            
+            <details>
+                <summary>2. Comprensión de los datos</summary>
+                <p>A continuación, se describe el análisis de los datos disponibles para la construcción del modelo</p>
+            
+                <h3>2.1 Recopilación de datos iniciales</h3>
+                <p>Cual fue la manera en que se llevó a cabo el proceso de recopilación de los datos, indicando si los datos utilizados corresponden a toda una población o si son una muestra representativa de la misma, especificando el porcentaje que representan en relación a la población en cuestión. Además, identificar las razones por las cuales existen valores perdidos en los datos. Asimismo, indicar si los datos han sido sometidos a algún tipo de tratamiento o transformación, o si se encuentran en su formato original</p>
+                <table class="dataframe display">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Ítem</th>
+      <th>Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Fuente de Datos</td>
+      <td>El conjunto de datos es una extracción del conjunto de datos original liberado por Instituto Nacional Penitenciario y Carcelario en enero del 2022. Los datos corresponden a las personas que han sido sindicadas por uno o más delitos dese el año 1997 hasta el año año 2021.\nEl dominio del conjunto de datos es la Justicia y Derecho en Colombia.\nEl dataset contiene Variables demográficas como sexo, edad, nivel educativo, estado civil. El historial delictivo, como el tipo de delito, si reincide o no, y los meses de condena asignados.</td>
+    </tr>
+    <tr>
+      <td>Filas</td>
+      <td>19770</td>
+    </tr>
+    <tr>
+      <td>Columnas</td>
+      <td>20</td>
+    </tr>
+    <tr>
+      <td>Atributos sensibles</td>
+      <td>[ENC_GENERO]</td>
+    </tr>
+    <tr>
+      <td>Atributo de clase</td>
+      <td>ENC_REINCIDENTE</td>
+    </tr>
+    <tr>
+      <td>Formato</td>
+      <td></td>
+    </tr>
+    <tr>
+      <td>Descripción</td>
+      <td>El conjunto de datos es una extracción del conjunto de datos original liberado por Instituto Nacional Penitenciario y Carcelario en enero del 2022. Los datos corresponden a las personas que han sido sindicadas por uno o más delitos dese el año 1997 hasta el año año 2021.\nEl dominio del conjunto de datos es la Justicia y Derecho en Colombia.\nEl dataset contiene Variables demográficas como sexo, edad, nivel educativo, estado civil. El historial delictivo, como el tipo de delito, si reincide o no, y los meses de condena asignados.</td>
+    </tr>
+  </tbody>
+</table>
+                
+                <h3>2.2 Descripción de los datos</h3>
+                <p>En esta sección se busca comprender la naturaleza y las características de cada atributo en el conjunto de datos. Esto implica examinar el tipo de dato, la escala de medición, el rango de valores posibles, la presencia de valores atípicos o perdidos, y cualquier otra información relevante relacionada con cada atributo</p>
+                <table class="dataframe display">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Atributo</th>
+      <th>Descripción</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>Condena por el delito de homicidio</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>Condena por el delito de hurto según</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>Condena por fabricación, tráfico o porte de armas de fuego y municiones</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>Condena por tráfico, fabricación o porte de estupefacientes</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>Condena por concierto para delinquir</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>Condena por fabricación, tráfico o porte de armas, municiones de uso restringido o explosivos</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>Condena por actos sexuales con persona menor de 14 años</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>Condena por acceso carnal con persona menor de 14 años</td>
+    </tr>
+    <tr>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>Año de ingreso al sistema penitenciario (formato AAAA), según fecha de la sentencia que ordena privación de la libertad.</td>
+    </tr>
+    <tr>
+      <td>ENC_INTRAMUROS</td>
+      <td>Régimen de cumplimiento de la pena: 1 = intramuros (establecimiento carcelario); 0 = extramuros (prisión domiciliaria o vigilancia electrónica)</td>
+    </tr>
+    <tr>
+      <td>ENC_MESES_CONDENA</td>
+      <td>Duración de la pena privativa de la libertad en meses, calculada a partir de la sentencia firme.</td>
+    </tr>
+    <tr>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>Categoría de edad al ingreso: 'Entre 18 y 25 años', 'Entre 26 y 40 años', 'Entre 41 y 60 años', 'Mayor de 60 años'</td>
+    </tr>
+    <tr>
+      <td>ENC_GENERO</td>
+      <td>Género de la persona: 1 = masculino, 0 = femenino</td>
+    </tr>
+    <tr>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>Nivel educativo al momento de la sentencia: 'Sin educación formal', 'Básica primaria', 'Básica secundaria', 'Media', 'Técnico/Tecnólogo', 'Universitario o superior'</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>Regional Central del INPEC</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>Regional Occidente del INPEC</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>Regional Noroeste del INPEC</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>Regional Norte del INPEC</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>Regional Oriente del INPEC</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>Regional Viejo Caldas del INPEC</td>
+    </tr>
+  </tbody>
+</table>
+
+                <h3>Estadística atributos ordinales y nominales</h3>
+                <table class="dataframe display">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Atributo</th>
+      <th>Tipo</th>
+      <th>Cantidad</th>
+      <th>Valores unicos</th>
+      <th>Mas frecuente</th>
+      <th>Menos frecuente</th>
+      <th>Valores nulos</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_INTRAMUROS</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>10</td>
+      <td>2</td>
+      <td>10</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_GENERO</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>1</td>
+      <td>0</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>9</td>
+      <td>3</td>
+      <td>9</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+    <tr>
+      <td>ENC_REINCIDENTE</td>
+      <td>category</td>
+      <td>19770</td>
+      <td>2</td>
+      <td>0</td>
+      <td>1</td>
+      <td>0</td>
+    </tr>
+  </tbody>
+</table>
+
+                <h3>Estadística atributos continuos y discretos</h3>
+                <table class="dataframe display">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Atributo</th>
+      <th>Tipo</th>
+      <th>Cantidad</th>
+      <th>Minimo</th>
+      <th>Mediana</th>
+      <th>Maximo</th>
+      <th>Promedio</th>
+      <th>Desv Std</th>
+      <th>% Nulos</th>
+      <th>% Ceros</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>int64</td>
+      <td>19770</td>
+      <td>1997</td>
+      <td>2018.0</td>
+      <td>2021</td>
+      <td>2017.615933</td>
+      <td>2.395119</td>
+      <td>0.0</td>
+      <td>0.000000</td>
+    </tr>
+    <tr>
+      <td>ENC_MESES_CONDENA</td>
+      <td>int64</td>
+      <td>19770</td>
+      <td>0</td>
+      <td>91.0</td>
+      <td>720</td>
+      <td>129.380931</td>
+      <td>113.355656</td>
+      <td>0.0</td>
+      <td>0.025291</td>
+    </tr>
+  </tbody>
+</table>
+
+                <h3>2.3 Exploración de datos</h3>
+                <p>Se realiza el análisis de las distribuciones de las variables de forma individual como relacionadas con la clase y los atributos sensibles</p>
+
+                <h3>Relación entre atributos</h3>
+                <table class="dataframe display">
+  <thead>
+    <tr style="text-align: center;">
+      <th>attribute1</th>
+      <th>attribute2</th>
+      <th>proporcion</th>
+      <th>tipo</th>
+      <th>concern</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_GENERO</td>
+      <td>0.892985</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_GENERO=1 (proporción 0.893), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.701332</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_REINCIDENTE=0 (proporción 0.701), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_GENERO</td>
+      <td>0.898766</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HURTO=0 y ENC_GENERO=1 (proporción 0.899), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.759287</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HURTO=0 y ENC_REINCIDENTE=0 (proporción 0.759), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_GENERO</td>
+      <td>0.890951</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_GENERO=1 (proporción 0.891), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.733653</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_REINCIDENTE=0 (proporción 0.734), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_GENERO</td>
+      <td>0.942407</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_GENERO=1 (proporción 0.942), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.717503</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_REINCIDENTE=0 (proporción 0.718), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_GENERO</td>
+      <td>0.918513</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_GENERO=1 (proporción 0.919), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.716650</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_REINCIDENTE=0 (proporción 0.717), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>ENC_GENERO</td>
+      <td>0.907252</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 y ENC_GENERO=1 (proporción 0.907), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.715952</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 y ENC_REINCIDENTE=0 (proporción 0.716), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_GENERO</td>
+      <td>0.905270</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACTOS_SEXUALES_MENOR_14=0 y ENC_GENERO=1 (proporción 0.905), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.708336</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACTOS_SEXUALES_MENOR_14=0 y ENC_REINCIDENTE=0 (proporción 0.708), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>ENC_GENERO</td>
+      <td>0.908358</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACC_CARNAL_14=0 y ENC_GENERO=1 (proporción 0.908), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.715159</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACC_CARNAL_14=0 y ENC_REINCIDENTE=0 (proporción 0.715), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>ENC_GENERO</td>
+      <td>0.857143</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ANNO_INGRESO=(1996.976, 2003.0] y ENC_GENERO=1 (proporción 0.857), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>1.000000</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ANNO_INGRESO=(1996.976, 2003.0] y ENC_REINCIDENTE=0 (proporción 1.000), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_INTRAMUROS</td>
+      <td>ENC_GENERO</td>
+      <td>0.865945</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_INTRAMUROS=0 y ENC_GENERO=1 (proporción 0.866), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_INTRAMUROS</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.767452</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_INTRAMUROS=0 y ENC_REINCIDENTE=0 (proporción 0.767), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_MESES_CONDENA</td>
+      <td>ENC_GENERO</td>
+      <td>0.892998</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_MESES_CONDENA=(-0.72, 180.0] y ENC_GENERO=1 (proporción 0.893), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_MESES_CONDENA</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.696203</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_MESES_CONDENA=(-0.72, 180.0] y ENC_REINCIDENTE=0 (proporción 0.696), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>ENC_GENERO</td>
+      <td>0.913060</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_RANGOS_EDAD_INPEC=1 y ENC_GENERO=1 (proporción 0.913), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.851462</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_RANGOS_EDAD_INPEC=1 y ENC_REINCIDENTE=0 (proporción 0.851), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>ENC_GENERO</td>
+      <td>0.942263</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_NIVEL_EDUCATIVO=1 y ENC_GENERO=1 (proporción 0.942), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.741339</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_NIVEL_EDUCATIVO=1 y ENC_REINCIDENTE=0 (proporción 0.741), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>ENC_GENERO</td>
+      <td>0.908797</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_CENTRAL=0 y ENC_GENERO=1 (proporción 0.909), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.720868</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_CENTRAL=0 y ENC_REINCIDENTE=0 (proporción 0.721), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>ENC_GENERO</td>
+      <td>0.908086</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_OCCIDENTE=0 y ENC_GENERO=1 (proporción 0.908), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.713577</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_OCCIDENTE=0 y ENC_REINCIDENTE=0 (proporción 0.714), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>ENC_GENERO</td>
+      <td>0.913033</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_NOROESTE=0 y ENC_GENERO=1 (proporción 0.913), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.714787</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_NOROESTE=0 y ENC_REINCIDENTE=0 (proporción 0.715), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>ENC_GENERO</td>
+      <td>0.908610</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_NORTE=0 y ENC_GENERO=1 (proporción 0.909), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.720887</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_NORTE=0 y ENC_REINCIDENTE=0 (proporción 0.721), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>ENC_GENERO</td>
+      <td>0.907682</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_ORIENTE=0 y ENC_GENERO=1 (proporción 0.908), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.717360</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_ORIENTE=0 y ENC_REINCIDENTE=0 (proporción 0.717), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>ENC_GENERO</td>
+      <td>0.910360</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_VIEJO_CALDAS=0 y ENC_GENERO=1 (proporción 0.910), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.719728</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_VIEJO_CALDAS=0 y ENC_REINCIDENTE=0 (proporción 0.720), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_HURTO</td>
+      <td>0.708951</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_HURTO=0 (proporción 0.709), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>0.805670</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_FATRAPORTE_ARMAS_MUNICIONES=0 (proporción 0.806), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>0.725151</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_TRAFAPORTE_ESTUPEFACIENTES=0 (proporción 0.725), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>0.825645</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_CONCIERTO_DELINQUIR=0 (proporción 0.826), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>0.932592</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 (proporción 0.933), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>0.929023</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_ACTOS_SEXUALES_MENOR_14=0 (proporción 0.929), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>0.979819</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_ACC_CARNAL_14=0 (proporción 0.980), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>0.000755</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_HOMICIDIO=0 y ENC_ANNO_INGRESO=(1996.976, 2003.0] (proporción 0.001), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_INTRAMUROS</td>
+      <td>0.621636</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_INTRAMUROS=1 (proporción 0.622), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_MESES_CONDENA</td>
+      <td>0.011669</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_HOMICIDIO=0 y ENC_MESES_CONDENA=(360.0, 540.0] (proporción 0.012), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>0.034802</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_HOMICIDIO=0 y ENC_RANGOS_EDAD_INPEC=8 (proporción 0.035), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>0.020456</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_HOMICIDIO=0 y ENC_NIVEL_EDUCATIVO=1 (proporción 0.020), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>0.644289</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_REGIONAL_CENTRAL=0 (proporción 0.644), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>0.814044</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_REGIONAL_OCCIDENTE=0 (proporción 0.814), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>0.854819</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_REGIONAL_NOROESTE=0 (proporción 0.855), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.880903</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_REGIONAL_NORTE=0 (proporción 0.881), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.907743</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_REGIONAL_ORIENTE=0 (proporción 0.908), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.898202</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HOMICIDIO=0 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.898), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>0.755380</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HURTO=0 y ENC_FATRAPORTE_ARMAS_MUNICIONES=0 (proporción 0.755), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>0.718300</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HURTO=0 y ENC_TRAFAPORTE_ESTUPEFACIENTES=0 (proporción 0.718), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>0.802810</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HURTO=0 y ENC_CONCIERTO_DELINQUIR=0 (proporción 0.803), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>0.927485</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HURTO=0 y ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 (proporción 0.927), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>0.929061</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HURTO=0 y ENC_ACTOS_SEXUALES_MENOR_14=0 (proporción 0.929), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>0.979781</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HURTO=0 y ENC_ACC_CARNAL_14=0 (proporción 0.980), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>0.000822</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_HURTO=0 y ENC_ANNO_INGRESO=(1996.976, 2003.0] (proporción 0.001), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_INTRAMUROS</td>
+      <td>0.649212</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HURTO=0 y ENC_INTRAMUROS=1 (proporción 0.649), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_MESES_CONDENA</td>
+      <td>0.006648</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_HURTO=0 y ENC_MESES_CONDENA=(540.0, 720.0] (proporción 0.007), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>0.041467</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_HURTO=0 y ENC_RANGOS_EDAD_INPEC=8 (proporción 0.041), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>0.023783</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_HURTO=0 y ENC_NIVEL_EDUCATIVO=1 (proporción 0.024), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>0.675874</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HURTO=0 y ENC_REGIONAL_CENTRAL=0 (proporción 0.676), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>0.791158</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HURTO=0 y ENC_REGIONAL_OCCIDENTE=0 (proporción 0.791), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>0.853530</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HURTO=0 y ENC_REGIONAL_NOROESTE=0 (proporción 0.854), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.888828</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HURTO=0 y ENC_REGIONAL_NORTE=0 (proporción 0.889), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.908773</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HURTO=0 y ENC_REGIONAL_ORIENTE=0 (proporción 0.909), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.881837</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_HURTO=0 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.882), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>0.741615</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_TRAFAPORTE_ESTUPEFACIENTES=0 (proporción 0.742), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>0.823402</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_CONCIERTO_DELINQUIR=0 (proporción 0.823), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>0.916729</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 (proporción 0.917), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>0.929955</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_ACTOS_SEXUALES_MENOR_14=0 (proporción 0.930), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>0.979891</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_ACC_CARNAL_14=0 (proporción 0.980), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>0.000877</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_ANNO_INGRESO=(1996.976, 2003.0] (proporción 0.001), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_INTRAMUROS</td>
+      <td>0.674742</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_INTRAMUROS=1 (proporción 0.675), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_MESES_CONDENA</td>
+      <td>0.036507</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_MESES_CONDENA=(360.0, 540.0] (proporción 0.037), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>0.039409</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_RANGOS_EDAD_INPEC=8 (proporción 0.039), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>0.022201</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_NIVEL_EDUCATIVO=1 (proporción 0.022), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>0.624739</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_REGIONAL_CENTRAL=0 (proporción 0.625), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>0.819893</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_REGIONAL_OCCIDENTE=0 (proporción 0.820), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>0.860989</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_REGIONAL_NOROESTE=0 (proporción 0.861), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.895405</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_REGIONAL_NORTE=0 (proporción 0.895), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.906606</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_REGIONAL_ORIENTE=0 (proporción 0.907), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.892368</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_MUNICIONES=0 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.892), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>0.870335</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_CONCIERTO_DELINQUIR=0 (proporción 0.870), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>0.921236</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 (proporción 0.921), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>0.933012</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_ACTOS_SEXUALES_MENOR_14=0 (proporción 0.933), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>0.980566</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_ACC_CARNAL_14=0 (proporción 0.981), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>0.000515</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_ANNO_INGRESO=(1996.976, 2003.0] (proporción 0.001), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_INTRAMUROS</td>
+      <td>0.651158</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_INTRAMUROS=1 (proporción 0.651), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_MESES_CONDENA</td>
+      <td>0.008816</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_MESES_CONDENA=(540.0, 720.0] (proporción 0.009), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>0.033977</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_RANGOS_EDAD_INPEC=8 (proporción 0.034), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>0.022136</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_NIVEL_EDUCATIVO=1 (proporción 0.022), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>0.620849</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_REGIONAL_CENTRAL=0 (proporción 0.621), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>0.814929</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_REGIONAL_OCCIDENTE=0 (proporción 0.815), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>0.869112</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_REGIONAL_NOROESTE=0 (proporción 0.869), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.892471</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_REGIONAL_NORTE=0 (proporción 0.892), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.901544</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_REGIONAL_ORIENTE=0 (proporción 0.902), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.901094</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_TRAFAPORTE_ESTUPEFACIENTES=0 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.901), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>0.927945</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 (proporción 0.928), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>0.936648</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_ACTOS_SEXUALES_MENOR_14=0 (proporción 0.937), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>0.981621</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_ACC_CARNAL_14=0 (proporción 0.982), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>0.000791</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_ANNO_INGRESO=(1996.976, 2003.0] (proporción 0.001), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_INTRAMUROS</td>
+      <td>0.620862</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_INTRAMUROS=1 (proporción 0.621), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_MESES_CONDENA</td>
+      <td>0.049233</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_MESES_CONDENA=(360.0, 540.0] (proporción 0.049), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>0.034506</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_RANGOS_EDAD_INPEC=8 (proporción 0.035), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>0.022700</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_NIVEL_EDUCATIVO=1 (proporción 0.023), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>0.630660</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_REGIONAL_CENTRAL=0 (proporción 0.631), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>0.800511</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_REGIONAL_OCCIDENTE=0 (proporción 0.801), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>0.884798</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_REGIONAL_NOROESTE=0 (proporción 0.885), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.884676</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_REGIONAL_NORTE=0 (proporción 0.885), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.903907</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_REGIONAL_ORIENTE=0 (proporción 0.904), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.895448</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_CONCIERTO_DELINQUIR=0 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.895), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>0.943429</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 y ENC_ACTOS_SEXUALES_MENOR_14=0 (proporción 0.943), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>0.983620</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 y ENC_ACC_CARNAL_14=0 (proporción 0.984), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>0.000759</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 y ENC_ANNO_INGRESO=(1996.976, 2003.0] (proporción 0.001), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>ENC_INTRAMUROS</td>
+      <td>0.664262</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 y ENC_INTRAMUROS=1 (proporción 0.664), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>ENC_MESES_CONDENA</td>
+      <td>0.007756</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 y ENC_MESES_CONDENA=(540.0, 720.0] (proporción 0.008), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>0.035255</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 y ENC_RANGOS_EDAD_INPEC=8 (proporción 0.035), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>0.022401</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 y ENC_NIVEL_EDUCATIVO=1 (proporción 0.022), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>0.638770</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 y ENC_REGIONAL_CENTRAL=0 (proporción 0.639), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>0.807507</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 y ENC_REGIONAL_OCCIDENTE=0 (proporción 0.808), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>0.865379</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 y ENC_REGIONAL_NOROESTE=0 (proporción 0.865), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.889407</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 y ENC_REGIONAL_NORTE=0 (proporción 0.889), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.909313</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 y ENC_REGIONAL_ORIENTE=0 (proporción 0.909), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.889624</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES=0 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.890), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>0.999092</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACTOS_SEXUALES_MENOR_14=0 y ENC_ACC_CARNAL_14=0 (proporción 0.999), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>0.000748</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_ACTOS_SEXUALES_MENOR_14=0 y ENC_ANNO_INGRESO=(1996.976, 2003.0] (proporción 0.001), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_INTRAMUROS</td>
+      <td>0.637422</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACTOS_SEXUALES_MENOR_14=0 y ENC_INTRAMUROS=1 (proporción 0.637), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_MESES_CONDENA</td>
+      <td>0.007850</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_ACTOS_SEXUALES_MENOR_14=0 y ENC_MESES_CONDENA=(540.0, 720.0] (proporción 0.008), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>0.047899</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_ACTOS_SEXUALES_MENOR_14=0 y ENC_RANGOS_EDAD_INPEC=7 (proporción 0.048), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>0.020665</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_ACTOS_SEXUALES_MENOR_14=0 y ENC_NIVEL_EDUCATIVO=1 (proporción 0.021), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>0.644257</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACTOS_SEXUALES_MENOR_14=0 y ENC_REGIONAL_CENTRAL=0 (proporción 0.644), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>0.803012</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACTOS_SEXUALES_MENOR_14=0 y ENC_REGIONAL_OCCIDENTE=0 (proporción 0.803), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>0.866289</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACTOS_SEXUALES_MENOR_14=0 y ENC_REGIONAL_NOROESTE=0 (proporción 0.866), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.886314</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACTOS_SEXUALES_MENOR_14=0 y ENC_REGIONAL_NORTE=0 (proporción 0.886), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.908528</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACTOS_SEXUALES_MENOR_14=0 y ENC_REGIONAL_ORIENTE=0 (proporción 0.909), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.891600</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACTOS_SEXUALES_MENOR_14=0 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.892), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>0.000719</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_ACC_CARNAL_14=0 y ENC_ANNO_INGRESO=(1996.976, 2003.0] (proporción 0.001), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>ENC_INTRAMUROS</td>
+      <td>0.649407</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACC_CARNAL_14=0 y ENC_INTRAMUROS=1 (proporción 0.649), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>ENC_MESES_CONDENA</td>
+      <td>0.007449</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_ACC_CARNAL_14=0 y ENC_MESES_CONDENA=(540.0, 720.0] (proporción 0.007), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>0.032311</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_ACC_CARNAL_14=0 y ENC_RANGOS_EDAD_INPEC=8 (proporción 0.032), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>0.021832</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_ACC_CARNAL_14=0 y ENC_NIVEL_EDUCATIVO=1 (proporción 0.022), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>0.642472</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACC_CARNAL_14=0 y ENC_REGIONAL_CENTRAL=0 (proporción 0.642), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>0.804901</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACC_CARNAL_14=0 y ENC_REGIONAL_OCCIDENTE=0 (proporción 0.805), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>0.865259</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACC_CARNAL_14=0 y ENC_REGIONAL_NOROESTE=0 (proporción 0.865), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.888838</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACC_CARNAL_14=0 y ENC_REGIONAL_NORTE=0 (proporción 0.889), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.907587</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACC_CARNAL_14=0 y ENC_REGIONAL_ORIENTE=0 (proporción 0.908), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.890944</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ACC_CARNAL_14=0 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.891), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>ENC_INTRAMUROS</td>
+      <td>0.571429</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ANNO_INGRESO=(1996.976, 2003.0] y ENC_INTRAMUROS=1 (proporción 0.571), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>ENC_MESES_CONDENA</td>
+      <td>0.000000</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_ANNO_INGRESO=(1996.976, 2003.0] y ENC_MESES_CONDENA=(540.0, 720.0] (proporción 0.000), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>0.000000</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_ANNO_INGRESO=(1996.976, 2003.0] y ENC_RANGOS_EDAD_INPEC=1 (proporción 0.000), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>0.000000</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_ANNO_INGRESO=(1996.976, 2003.0] y ENC_NIVEL_EDUCATIVO=6 (proporción 0.000), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>0.660377</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ANNO_INGRESO=(2003.0, 2009.0] y ENC_REGIONAL_CENTRAL=0 (proporción 0.660), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>0.714286</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ANNO_INGRESO=(1996.976, 2003.0] y ENC_REGIONAL_OCCIDENTE=0 (proporción 0.714), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>0.928571</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ANNO_INGRESO=(1996.976, 2003.0] y ENC_REGIONAL_NOROESTE=0 (proporción 0.929), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.928571</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ANNO_INGRESO=(1996.976, 2003.0] y ENC_REGIONAL_NORTE=0 (proporción 0.929), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.928571</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ANNO_INGRESO=(1996.976, 2003.0] y ENC_REGIONAL_ORIENTE=0 (proporción 0.929), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>1.000000</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_ANNO_INGRESO=(1996.976, 2003.0] y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 1.000), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_INTRAMUROS</td>
+      <td>ENC_MESES_CONDENA</td>
+      <td>0.010976</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_INTRAMUROS=0 y ENC_MESES_CONDENA=(360.0, 540.0] (proporción 0.011), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_INTRAMUROS</td>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>0.032782</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_INTRAMUROS=0 y ENC_RANGOS_EDAD_INPEC=8 (proporción 0.033), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_INTRAMUROS</td>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>0.021221</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_INTRAMUROS=0 y ENC_NIVEL_EDUCATIVO=1 (proporción 0.021), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_INTRAMUROS</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>0.705254</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_INTRAMUROS=0 y ENC_REGIONAL_CENTRAL=0 (proporción 0.705), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_INTRAMUROS</td>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>0.795258</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_INTRAMUROS=0 y ENC_REGIONAL_OCCIDENTE=0 (proporción 0.795), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_INTRAMUROS</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>0.856286</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_INTRAMUROS=0 y ENC_REGIONAL_NOROESTE=0 (proporción 0.856), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_INTRAMUROS</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.807844</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_INTRAMUROS=0 y ENC_REGIONAL_NORTE=0 (proporción 0.808), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_INTRAMUROS</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.909410</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_INTRAMUROS=0 y ENC_REGIONAL_ORIENTE=0 (proporción 0.909), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_INTRAMUROS</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.925948</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_INTRAMUROS=0 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.926), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_MESES_CONDENA</td>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>0.047732</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_MESES_CONDENA=(-0.72, 180.0] y ENC_RANGOS_EDAD_INPEC=7 (proporción 0.048), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_MESES_CONDENA</td>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>0.018592</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_MESES_CONDENA=(-0.72, 180.0] y ENC_NIVEL_EDUCATIVO=1 (proporción 0.019), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_MESES_CONDENA</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>0.651701</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_MESES_CONDENA=(-0.72, 180.0] y ENC_REGIONAL_CENTRAL=0 (proporción 0.652), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_MESES_CONDENA</td>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>0.805248</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_MESES_CONDENA=(-0.72, 180.0] y ENC_REGIONAL_OCCIDENTE=0 (proporción 0.805), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_MESES_CONDENA</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>0.849156</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_MESES_CONDENA=(-0.72, 180.0] y ENC_REGIONAL_NOROESTE=0 (proporción 0.849), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_MESES_CONDENA</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.878758</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_MESES_CONDENA=(-0.72, 180.0] y ENC_REGIONAL_NORTE=0 (proporción 0.879), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_MESES_CONDENA</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.914557</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_MESES_CONDENA=(-0.72, 180.0] y ENC_REGIONAL_ORIENTE=0 (proporción 0.915), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_MESES_CONDENA</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.900580</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_MESES_CONDENA=(-0.72, 180.0] y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.901), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>0.005848</td>
+      <td>BAJO</td>
+      <td>Baja asociación entre ENC_RANGOS_EDAD_INPEC=1 y ENC_NIVEL_EDUCATIVO=1 (proporción 0.006), que sugiere baja dependencia entre estos atributos.</td>
+    </tr>
+    <tr>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>0.671735</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_RANGOS_EDAD_INPEC=1 y ENC_REGIONAL_CENTRAL=0 (proporción 0.672), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>0.786745</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_RANGOS_EDAD_INPEC=1 y ENC_REGIONAL_OCCIDENTE=0 (proporción 0.787), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>0.823392</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_RANGOS_EDAD_INPEC=1 y ENC_REGIONAL_NOROESTE=0 (proporción 0.823), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.923197</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_RANGOS_EDAD_INPEC=1 y ENC_REGIONAL_NORTE=0 (proporción 0.923), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.903704</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_RANGOS_EDAD_INPEC=1 y ENC_REGIONAL_ORIENTE=0 (proporción 0.904), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.891228</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_RANGOS_EDAD_INPEC=1 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.891), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>0.743649</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_NIVEL_EDUCATIVO=1 y ENC_REGIONAL_CENTRAL=0 (proporción 0.744), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>0.819861</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_NIVEL_EDUCATIVO=1 y ENC_REGIONAL_OCCIDENTE=0 (proporción 0.820), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>0.868360</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_NIVEL_EDUCATIVO=1 y ENC_REGIONAL_NOROESTE=0 (proporción 0.868), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.836028</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_NIVEL_EDUCATIVO=1 y ENC_REGIONAL_NORTE=0 (proporción 0.836), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.879908</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_NIVEL_EDUCATIVO=1 y ENC_REGIONAL_ORIENTE=0 (proporción 0.880), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.852194</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_NIVEL_EDUCATIVO=1 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.852), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>0.696016</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_CENTRAL=0 y ENC_REGIONAL_OCCIDENTE=0 (proporción 0.696), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>0.790138</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_CENTRAL=0 y ENC_REGIONAL_NOROESTE=0 (proporción 0.790), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.828402</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_CENTRAL=0 y ENC_REGIONAL_NORTE=0 (proporción 0.828), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.855464</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_CENTRAL=0 y ENC_REGIONAL_ORIENTE=0 (proporción 0.855), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.829980</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_CENTRAL=0 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.830), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>0.832883</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_OCCIDENTE=0 y ENC_REGIONAL_NOROESTE=0 (proporción 0.833), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.863354</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_OCCIDENTE=0 y ENC_REGIONAL_NORTE=0 (proporción 0.863), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.884903</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_OCCIDENTE=0 y ENC_REGIONAL_ORIENTE=0 (proporción 0.885), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.864610</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_OCCIDENTE=0 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.865), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>0.872881</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_NOROESTE=0 y ENC_REGIONAL_NORTE=0 (proporción 0.873), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.892928</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_NOROESTE=0 y ENC_REGIONAL_ORIENTE=0 (proporción 0.893), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.874050</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_NOROESTE=0 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.874), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>0.895880</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_NORTE=0 y ENC_REGIONAL_ORIENTE=0 (proporción 0.896), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.877522</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_NORTE=0 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.878), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>0.879864</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_REGIONAL_ORIENTE=0 y ENC_REGIONAL_VIEJO_CALDAS=0 (proporción 0.880), indicando posible sobreajuste o dependencia fuerte que podría afectar la generalización del modelo.</td>
+    </tr>
+    <tr>
+      <td>ENC_GENERO</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>0.803352</td>
+      <td>ALTO</td>
+      <td>Alta asociación entre ENC_GENERO=0 y ENC_REINCIDENTE=0 (proporción 0.803), involucrando atributo sensible 'ENC_GENERO', lo cual podría indicar posible sesgo de discriminación.</td>
+    </tr>
+  </tbody>
+</table>                 
+
+                <h3>Gráfico de Distribución de las Variables</h3>
+                <img src="../images/ENC_REINCIDENTE/Dist_Plots_target.png" alt="Distribución de la Variable Objetivo">
+<img src="../images/ENC_REINCIDENTE/scatter_matrix.png" alt="Distribución de la Variable Objetivo">
+<img src="../images/ENC_REINCIDENTE/Heat_Maps.png" alt="Distribución de la Variable Objetivo">
+                <fieldset>
+                    <legend>1. Cargar el archivo<code>config_generated.json</code></legend>
+                    <input type="file" id="cfgInput" accept=".json">
+                </fieldset>
+
+                <fieldset>
+                    <legend>2. Otras columnas (1 o 2)</legend>
+                    <select id="others" multiple size="6" style="width:200px"></select>
+                </fieldset>
+
+               <div id="vis"></div>
+
+
+
+
+
+                <h3>2.4 Verificación de calidad de datos</h3>
+                <p>En esta sección se determina que atributos deben ser intervenidos y como se debería realizar dicha intervención</p>
+                <p>La tabla muestra para cada variable de tu conjunto de datos, su nombre y tipo (numérico o categórico), el porcentaje de valores faltantes, el grado de diversidad de valores (porcentaje de valores únicos), y —cuando aplica— los valores mínimo y máximo observados; además incluye una columna de “DQ Issue” que señala incidencias de calidad (por ejemplo categorías con muy baja frecuencia o valores atípicos fuera de los límites del rango intercuartílico), para detectar dónde imputar, agrupar niveles infrecuentes, recortar outliers o retirar registros erróneos antes de entrenar los modelos.</p>
+                <table class="dataframe display">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Attribute</th>
+      <th>Data Type</th>
+      <th>Missing Values%</th>
+      <th>Unique Values%</th>
+      <th>Minimum Value</th>
+      <th>Maximum Value</th>
+      <th>DQ Issue</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>ENC_HOMICIDIO</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_HURTO</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_CONCIERTO_DELINQUIR</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_FATRAPORTE_ARMAS_ACCESORIOS_MUNICIONES</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>int64</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>1997.0</td>
+      <td>2021.0</td>
+      <td>Possible date-time colum: transform before modeling step.</td>
+    </tr>
+    <tr>
+      <td>ENC_INTRAMUROS</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_MESES_CONDENA</td>
+      <td>int64</td>
+      <td>0.0</td>
+      <td>3</td>
+      <td>0.0</td>
+      <td>720.0</td>
+      <td>Column has 1260 outliers greater than upper bound (349.00) or lower than lower bound(-123.00). Cap them or remove them.</td>
+    </tr>
+    <tr>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_GENERO</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>3 rare categories: [8, 7, 9]. Group them into a single category or drop the categories.</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>No issue</td>
+    </tr>
+    <tr>
+      <td>ENC_REINCIDENTE</td>
+      <td>category</td>
+      <td>0.0</td>
+      <td>0</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>Target column</td>
+    </tr>
+  </tbody>
+</table>
+            </details>
+            
+            <details>
+                <summary>3. Preparación de los datos</summary>
+                <p>En esta etapa los datos deben ser intervenidos con el fin de que tengan las representaciones adecuadas tanto del caso de uso que se está solucionando</p>
+                <p>Los métodos basados en filtros realizan pruebas estadísticas de clasificación univariada, que evalúan la relación entre características</p>
+                <p>Una dependencia elevada mediante estas métricas señala la necesidad de examinar si dichas variables actúan como indicadores indirectos de una relación y, en consecuencia, ajustar el proceso de preprocesamiento de los datos.</p>
+                <p><b>Prueba F de ANOVA</b></p>
+                <p>La prueba cuantifica si existe una dependencia lineal entre dos grupos de características y ayuda tanto a la selección de atributos como a la detección de posibles proxies.</p>
+                <p><b>Prueba de independencia chi-cuadrado (χ²)</b></p>
+                <p>Evalúa si existe una asociación estadísticamente significativa entre dos variables categóricas no negativas (por ejemplo, nivel educativo y grupo étnico). </p>
+                <p><b>Información mutua (IM)</b></p>
+                <p>Mide la cantidad de información compartida entre dos variables sean continuas o discretas capturando tanto dependencias lineales como no lineales. </p> 
+
+                <table class="dataframe display">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Metrica</th>
+      <th>Columna_1</th>
+      <th>Columna_2</th>
+      <th>Valor</th>
+      <th>Ranking</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>4871.815234</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>ENC_REGIONAL_OCCIDENTE</td>
+      <td>2676.916087</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>ENC_REGIONAL_NOROESTE</td>
+      <td>1718.650885</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>1715.432888</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>ENC_HURTO</td>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>1517.732946</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>1366.232219</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>1352.116127</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>ENC_NIVEL_EDUCATIVO</td>
+      <td>1347.997192</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>1219.096619</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Chi-cuadrado</td>
+      <td>ENC_REGIONAL_CENTRAL</td>
+      <td>ENC_REGIONAL_ORIENTE</td>
+      <td>1128.500454</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>ANOVA F-test</td>
+      <td>ENC_REGIONAL_VIEJO_CALDAS</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>44.637731</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>ANOVA F-test</td>
+      <td>ENC_RANGOS_EDAD_INPEC</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>44.402345</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>ANOVA F-test</td>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_MESES_CONDENA</td>
+      <td>31.165493</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>ANOVA F-test</td>
+      <td>ENC_REGIONAL_NORTE</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>27.093236</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>ANOVA F-test</td>
+      <td>ENC_HOMICIDIO</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>23.031219</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>ANOVA F-test</td>
+      <td>ENC_TRAFAPORTE_ESTUPEFACIENTES</td>
+      <td>ENC_MESES_CONDENA</td>
+      <td>12.993536</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>ANOVA F-test</td>
+      <td>ENC_HURTO</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>11.431693</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>ANOVA F-test</td>
+      <td>ENC_REINCIDENTE</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>11.043499</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>ANOVA F-test</td>
+      <td>ENC_FATRAPORTE_ARMAS_MUNICIONES</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>9.564307</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>ANOVA F-test</td>
+      <td>ENC_INTRAMUROS</td>
+      <td>ENC_ANNO_INGRESO</td>
+      <td>9.230250</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Mutual Information</td>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>0.041372</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <td>Mutual Information</td>
+      <td>ENC_ACC_CARNAL_14</td>
+      <td>ENC_ACTOS_SEXUALES_MENOR_14</td>
+      <td>0.041372</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+                <p>Existen enfoques que permiten medir la diferencia que existe entre los grupos privilegiados y no privilegiados. El índice de Theil aplicado a la equidad en ML puede interpretarse como pruebas estadísticas de equidad evaluando si todos los individuos enfrentan "las mismas probabilidades" en términos de oportunidades. Valores altos sugieren que una parte significativa de los recursos está concentrada en pocas personas o grupos . Para determinar qué tan similares son dos distribuciones de probabilidad entre diferentes grupos sensibles se utilizó Jensen-Shannon Divergence. Para cuantificar cuánto se desvía una distribución de probabilidad de otra se aplicó se aplicó Kullback-Leibler Divergence con el fin de identificar si la transformación de los datos afecta de manera desigual a ciertos grupos sensibles. La paridad demográfica fue utilizada para evaluar si las etiquetas positivas son iguales entre los grupos sensibles.</p>                
+                <p>Este informe presenta el análisis de equidad realizado sobre el dataset.</p>
+                <table class="dataframe display">
+  <thead>
+    <tr style="text-align: center;">
+      <th>Group</th>
+      <th>Non-Privileged Label Distribution</th>
+      <th>Jensen-Shannon Divergence</th>
+      <th>Kullback-Leibler Divergence</th>
+      <th>Demographic Parity</th>
+      <th>Overall Theil</th>
+      <th>Within-group Theil</th>
+      <th>Between-group Theil</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Non-Privileged Group (ENC_GENERO != 1)</td>
+      <td>{0: 0.8033519553072626, 1: 0.19664804469273742}</td>
+      <td>0.051969</td>
+      <td>0.197427</td>
+      <td>0.094064</td>
+      <td>1.265118</td>
+      <td>1.270778</td>
+      <td>0.005069</td>
+    </tr>
+  </tbody>
+</table>
+                <p>El mapa de calor visualiza la matriz de correlaciones φK entre todas las variables del conjunto de datos, filtrando únicamente los pares con un coeficiente superior a 0.6. Las relaciones más débiles (φK < 0.6) se omiten, representándose en blanco para simplificar la interpretación. Cada celda coloreada refleja el grado de asociación no lineal o mixta entre dos atributos, los tonos rojizos (correlaciones moderadas) y los tonos verdosos (correlaciones más intensas). Un φK cercano a 1 se muestra en verde intenso, indicando que el par de variables que comparten patrones de variación significativos.</p> 
+                <img src="../images/ENC_REINCIDENTE/correlation_phik_heatmap.png" alt="Heatmap de Correlación">
+            </details>
+
+            <!-- Inicializa DataTables al cargar el DOM -->
+            <script>
+            $(document).ready(function() {
+                $('table.display').DataTable({
+                paging: true,
+                pageLength: 10,
+                lengthChange: false,
+                searching: true,
+                ordering: true,
+                info: true,
+                autoWidth: false
+                });
+            });
+            </script>
+            <script>
+                let data = [], sensitive = [], clazz = null, cols = [], others = [];
+
+                document.getElementById('cfgInput').addEventListener('change', e => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    const cfg = JSON.parse(reader.result);
+                    sensitive = cfg.dataset.sensitive_feature || [];
+                    clazz    = cfg.dataset.label_name;
+                    const X  = cfg.X_train, Y = cfg.y_train;
+                    data      = X.map((r,i) => ({ ...r, ...Y[i] }));
+                    cols      = Object.keys(X[0] || {});
+                    initSelector();
+                    showColumnTypes();
+                };
+                reader.readAsText(e.target.files[0]);
+                });
+
+                function initSelector(){
+                const sel = document.getElementById('others');
+                sel.innerHTML = '';
+                cols.filter(c => c !== clazz && !sensitive.includes(c))
+                    .forEach(c => {
+                        const o = document.createElement('option');
+                        o.value = o.text = c;
+                        sel.appendChild(o);
+                    });
+                sel.addEventListener('change', () => {
+                    others = [...sel.selectedOptions].map(o => o.value);
+                    renderAll();
+                });
+                }
+
+                /** 
+                *  Heurística automática: 
+                *  Si todos los valores son enteros,
+                *  están entre 1800 y (año actual + 5),
+                *  y su rango <= 150, es “año” → nominal.
+                *  Si no, igual que antes: pocas categorías → nominal; sino cuantitativa.
+                */
+                function detectType(field) {
+                const vals = data.map(r => r[field]).filter(v => v!=null);
+                // Todos números → puede ser cuantitativa o “año”
+                if (vals.every(v => typeof v === 'number')) {
+                    const allInt = vals.every(v => Number.isInteger(v));
+                    const min    = Math.min(...vals), 
+                        max    = Math.max(...vals), 
+                        range  = max - min;
+                    const curYear = new Date().getFullYear();
+                    // Heurística “¿rango plausible de años?”
+                    if (allInt && min >= 1800 && max <= curYear + 5 && range <= 150) {
+                    return 'nominal';
+                    }
+                    // Caídas en la regla original de pocas categorías
+                    const uniq   = new Set(vals).size;
+                    const hasBig = vals.some(v => Math.abs(v) >= 1000);
+                    return (uniq <= 20 && !hasBig) ? 'nominal' : 'quantitative';
+                }
+                // Todo lo demás → nominal
+                return 'nominal';
+                }
+
+                // A partir de ahora, puro numérico sólo si detectType devuelve quantitative
+                function isQuantitative(field) {
+                return detectType(field) === 'quantitative';
+                }
+
+                function showColumnTypes() {
+                const lines = cols.map(c => {
+                    const uni  = detectType(c),
+                        pure = isQuantitative(c) ? 'sí' : 'no';
+                    return `${c.padEnd(20)} → univariante: ${uni.padEnd(12)} cuantitativa pura: ${pure}`;
+                });
+                document.getElementById('colTypes').innerHTML = lines.join('<br>');
+                }
+
+                function makeSpec(subset){
+                const spec = { data:{values:subset}, width:500, height:400 };
+
+                if (others.length === 1) {
+                    const f = others[0], t = detectType(f);
+                    spec.mark = 'bar';
+                    spec.encoding = {
+                    x: t==='quantitative'
+                        ? { field:f, type:'quantitative' }
+                        : { field:f, type:'nominal' },
+                    y:       { aggregate:'count', type:'quantitative' },
+                    color:   { field:clazz, type:'nominal' },
+                    xOffset: { field:clazz, type:'nominal' }
+                    };
+                }
+                else if (others.length === 2) {
+                    const [a,b]   = others,
+                        aQuant = isQuantitative(a),
+                        bQuant = isQuantitative(b);
+
+                    if (aQuant && bQuant) {
+                    const uniqX = Array.from(new Set(subset.map(d=>d[a]))).sort((u,v)=>u-v),
+                            uniqY = Array.from(new Set(subset.map(d=>d[b]))).sort((u,v)=>u-v);
+                    spec.mark = 'point';
+                    spec.encoding = {
+                        x: { field:a, type:'quantitative', scale:{nice:false}, axis:{values:uniqX} },
+                        y: { field:b, type:'quantitative', scale:{nice:false}, axis:{values:uniqY} },
+                        color: { field:clazz, type:'nominal'}
+                    };
+                    }
+                    else if (!aQuant && !bQuant) {
+                    return {
+                        data: { values: subset },
+                        width: 500,
+                        height: 400,
+
+                        // 1) Usamos layer para superponer dos capas:
+                        layer: [
+                        // — capa base: barras rellenas por categoría (b)
+                        {
+                            mark: 'bar',
+                            encoding: {
+                            x:       { field: a, type: 'nominal' },
+                            xOffset: { field: b, type: 'nominal' },
+                            y:       { aggregate: 'count', type: 'quantitative' },
+                            fill:    { field: b, type: 'nominal', legend:{ title: b } }
+                            }
+                        },
+                        // — capa patrón: mismas barras pero solo contorno punteado por clase
+                        {
+                            mark: { type: 'bar', fillOpacity: 0, strokeWidth: 2 },
+                            encoding: {
+                            x:       { field: a, type: 'nominal' },
+                            xOffset: { field: b, type: 'nominal' },
+                            y:       { aggregate: 'count', type: 'quantitative' },
+                            stroke:     { value: 'black' },
+                            strokeDash: { field: clazz, type: 'nominal', legend:{ title:'Clase' } }
+                            }
+                        }
+                        ]
+                    };
+                    }
+                    else {
+                    const num = aQuant ? a : b,
+                            cat = aQuant ? b : a;
+                    spec.mark = { type:'boxplot', extent:'min-max' };
+                    spec.encoding = {
+                        x:     { field:cat, type:'nominal' },
+                        y:     { field:num, type:'quantitative' },
+                        color: { field:clazz, type:'nominal' }
+                    };
+                    }
+                }
+
+                return spec;
+                }
+
+                function renderAll(){
+                if (others.length<1 || others.length>2) return;
+                const vis = document.getElementById('vis');
+                vis.innerHTML = '';
+
+                if (sensitive.length) {
+                    sensitive.forEach(attr => {
+                    const vals    = [...new Set(data.map(r=>r[attr]))];
+                    const section = document.createElement('div');
+                    section.className = 'sensitive-section';
+                    section.innerHTML = `<h2>Facet by ${attr}</h2>`;
+                    const charts  = document.createElement('div');
+                    charts.className = 'charts';
+
+                    vals.forEach(val => {
+                        const sub = data.filter(r=>r[attr]===val);
+                        const cd  = document.createElement('div');
+                        cd.className = 'chart';
+                        cd.innerHTML = `<h4>${attr} = ${val}</h4><div></div>`;
+                        charts.appendChild(cd);
+                        vegaEmbed(cd.querySelector('div'), makeSpec(sub), {actions:false});
+                    });
+
+                    section.appendChild(charts);
+                    vis.appendChild(section);
+                    });
+                }
+                else {
+                    const charts = document.createElement('div');
+                    charts.className = 'charts';
+                    const cd     = document.createElement('div');
+                    cd.className = 'chart';
+                    const dd     = document.createElement('div');
+                    cd.appendChild(dd);
+                    charts.appendChild(cd);
+                    vis.appendChild(charts);
+                    vegaEmbed(dd, makeSpec(data), {actions:false});
+                }
+                }
+            </script>            
+        </body>
+        </html>
+        
