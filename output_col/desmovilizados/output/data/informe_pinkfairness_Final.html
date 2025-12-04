@@ -17256,12 +17256,12 @@
                 <p><b>LIME</b> Para cada observación, LIME generó un modelo lineal basado en ejemplos sintéticos creados alrededor de los centroides, ponderados según su proximidad. Al ajustar esta regresión, se obtuvieron pesos que cuantificaban la influencia de cada variable en la predicción. Finalmente, al promediar estos pesos sobre todas las instancias de prueba, LIME proporcionó una explicación global de la importancia de las características, manteniendo la interpretabilidad.</p>
                 <p>La barra “Promedio” refleja el valor medio de las puntuaciones locales de importancia (según LIME) de cada atributo tras aplicar la intervención de desescalado de sesgo en todos los modelos y todas las muestras. El eje X presenta cada característica, y el eje Y la media de su importancia (positiva o negativa) en la nueva predicción. Al escoger un clasificador concreto desde el desplegable, se despliegan únicamente las barras correspondientes a la contribución que LIME le asigna a cada atributo para ese modelo</p>
 <p>
-<img src="output/images/class/lime_importance.png" alt="Promedio del valor medio de las puntuaciones locales de importancia">
+<img src="../images/DES_BIE_ENC/lime_importance.png" alt="Promedio del valor medio de las puntuaciones locales de importancia">
 </p>
                 <p><b>SHAP</b> Representa cuánto cambia la salida del modelo al incorporar cada variable frente a un valor de referencia. Al promediar estos cambios sobre todas las instancias de prueba, se obtiene un mapa coherente de la relevancia media de cada característica, capturando tanto efectos lineales como interacciones complejas de forma rigurosa y teóricamente fundamentada.</p>
                 <p>La vista “Todos” agrupa, para cada atributo, la media de sus valores SHAP tras la intervención de mitigación de sesgo sobre todo el conjunto. El eje X muestra los nombres de las variables y el eje Y el valor medio de su aporte a la predicción ajustada. Seleccionando un clasificador en el menú, el gráfico filtra para exponer únicamente las barras de ese modelo, revelando qué atributos reciben mayor o menor impacto según la explicación global de SHAP</p>
 <p>
-<img src="output/images/class/shap_importance.png" alt="Media de sus valores SHAP tras la intervención de mitigación de sesgo">
+<img src="../images/DES_BIE_ENC/shap_importance.png" alt="Media de sus valores SHAP tras la intervención de mitigación de sesgo">
 </p>
                 <p><b>CERTI_FAI</b></p>
                 <p>Se generan múltiples versiones de los datos y se filtran aquellas que producen resultados distintos en un modelo de clasificación.</p>
